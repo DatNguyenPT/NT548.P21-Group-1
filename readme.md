@@ -126,7 +126,7 @@ Lab1 - Terraform/
 ├── main.tf                 # File chính khai báo các module
 ├── variables.tf            # Khai báo các biến
 ├── provider.tf             # Khai báo version Terraform
-├── backend.tf              # Cấu hình backend lưu trữ terraform state
+├── backend              # Cấu hình backend lưu trữ terraform state
 ├── modules/
 │   ├── ec2/                # Module EC2
 │   │   ├── main.tf
