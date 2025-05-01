@@ -156,7 +156,7 @@ Lab1 - Terraform/
 │       ├── main.tf
 │       ├── variables.tf
 │       └── outputs.tf
-└── terraform.tfstate       # File state (được tạo sau khi apply)     # File state (được tạo sau khi apply)
+└── terraform.tfstate       # File state (được tạo sau khi apply)    
 ```
 
 ### CloudFormation
