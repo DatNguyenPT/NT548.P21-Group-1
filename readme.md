@@ -92,35 +92,9 @@ hoặc
 terraform apply --auto-approve # Bỏ qua phần xác định các resource nào sẽ được tạo
 ```
 
-### 4. Cloudformation
+### Cấu trúc dự án
 
-```bash
-cd 'Lab1 - CloudFormation'
-```
-
-Triển khai stack CloudFormation:
-```bash
-aws cloudformation create-stack --stack-name lab1-stack --template-body file://template.yaml --capabilities CAPABILITY_IAM
-```
-
-Kiểm tra trạng thái stack:
-```bash
-aws cloudformation describe-stacks --stack-name lab1-stack
-```
-
-Cập nhật stack (nếu cần):
-```bash
-aws cloudformation update-stack --stack-name lab1-stack --template-body file://template.yaml --capabilities CAPABILITY_IAM
-```
-
-Xóa stack:
-```bash
-aws cloudformation delete-stack --stack-name lab1-stack
-```
-
-## Cấu trúc dự án
-
-### Terraform
+#### Terraform
 ```
 Lab1 - Terraform/
 ├── main.tf                 # File chính khai báo các module
@@ -159,11 +133,63 @@ Lab1 - Terraform/
 └── terraform.tfstate       # File state (được tạo sau khi apply)    
 ```
 
-### CloudFormation
+
+### 4. Cloudformation
+
+```bash
+cd 'Lab1 - CloudFormation'
+```
+#### Cấu trúc dự án
 ```
 Lab1 - CloudFormation/
-├── template.yaml           # Template CloudFormation
-└── parameters.json         # File tham số (nếu cần)
+├── compute-module.yaml
+├── network-module.yaml
+├── security-module.yaml
+├── vpc-module.yaml
+└── root-stack.yaml
+
+```
+
+1. Tạo S3 bucket để lưu trữ template
+
+```bash
+
+aws s3 mb s3://lab1-nested-stack-1234-ap-southeast-2
+
+```
+
+2. Upload các template vào S3 bucket
+
+```bash
+aws s3 cp vpc-module.yaml s3://lab1-nested-stack-1234-ap-southeast-2/
+aws s3 cp network-module.yaml s3://lab1-nested-stack-1234-ap-southeast-2/
+aws s3 cp security-module.yaml s3://lab1-nested-stack-1234-ap-southeast-2/
+aws s3 cp compute-module.yaml s3://lab1-nested-stack-1234-ap-southeast-2/
+aws s3 cp root-stack.yaml s3://lab1-nested-stack-1234-ap-southeast-2/
+```
+
+3. Triển khai root stack
+
+```bash
+aws cloudformation create-stack \
+  --stack-name aws-infrastructure \
+  --template-url https://lab1-nested-stack-1234-ap-southeast-2.s3.amazonaws.com/root-stack.yaml \
+  --parameters ParameterKey=AllowedIP,ParameterValue=your-ip/32 \
+               ParameterKey=KeyName,ParameterValue=your-key-pair \
+               ParameterKey=S3BucketName,ParameterValue=s3-bucket-name \
+  --capabilities CAPABILITY_IAM
+```
+Thay `your-ip/32` bằng địa chỉ IP của bạn (ví dụ: 203.0.113.10/32), `your-key-pair` bằng tên của EC2 KeyPair có sẵn, `s3-bucket-name` bằng tên s3 bucket vừa tạo.
+
+4. Theo dõi quá trình triển khai
+
+```bash
+aws cloudformation describe-stacks --stack-name aws-infrastructure
+```
+
+5. Xoá stack:
+```bash
+aws cloudformation delete-stack --stack-name aws-infrastructure
 ```
 
 ## Tài liệu tham khảo
